@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BPLO · Liloan | Premium Government Portal</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4c1d95;
+      --primary-light: #8b5cf6;
+      --accent: #fbbf24;
+      --glass: #ffffff;
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --text-dark: #1e1b4b;
+      --shadow-aura: 0 20px 40px rgba(76, 29, 149, 0.12);
+      --stat-green: #10b981;
+      --stat-blue: #3b82f6;
+      --stat-pink: #ec4899;
+      --stat-orange: #f59e0b;
+      --bg-gradient: radial-gradient(circle at top right, #faf5ff, #f3e8ff, #f8fafc);
+    }
+
+    body.dark-mode {
+      --primary: #a78bfa;
+      --primary-light: #c4b5fd;
+      --glass: #1e293b;
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-dark: #f1f5f9;
+      --bg-gradient: radial-gradient(circle at top right, #1e1b4b, #0f172a, #020617);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: var(--bg-gradient); background-attachment: fixed; color: var(--text-dark); min-height: 100vh; padding-bottom: 80px; transition: background 0.3s ease; }
+
+    .header-nav {
+      position: sticky; top: 0; z-index: 2000;
+      background: var(--glass); backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--glass-border); padding: 0.8rem 5%;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .nav-wrapper { display: flex; align-items: center; gap: 15px; flex: 1; justify-content: flex-end; }
+    .nav-group { display: flex; align-items: center; gap: 12px; }
+
+    .live-badge { 
+      background: #000; color: #fff; padding: 0.4rem 0.8rem; border-radius: 8px; 
+      font-size: 0.75rem; font-weight: 800; border: 1px solid #333;
+      min-width: 180px; text-align: center; white-space: nowrap;
+    }
+    body.dark-mode .live-badge { background: #fff; color: #000; }
+
+    .dropdown { position: relative; } 
+    .dropdown-content {
+      position: absolute; top: 100%; right: 0; width: 280px;
+      background: var(--glass); border-radius: 18px; padding: 0.8rem;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      display: none; border: 1px solid var(--glass-border);
+      animation: slideUp 0.3s ease;
+      z-index: 2001;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+
+    .btn-outline {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      color: var(--text-dark); padding: 0.6rem 1.2rem; border-radius: 12px;
+      font-weight: 700; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; gap: 10px; font-size: 0.85rem;
+      text-decoration: none;
+    }
+    .btn-outline:hover { background: var(--primary); color: white !important; transform: translateY(-2px); }
+    .btn-outline:hover i { color: white !important; }
+
+    .icon-home { color: #3b82f6; }
+    .icon-manuals { color: #f59e0b; }
+    .icon-dirs { color: #0ea5e9; }
+    .icon-more { color: #10b981; }
+    .icon-feedback { color: #f43f5e; }
+
+    .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); z-index: 3001; }
+
+    .identity-row { display: flex; gap: 2rem; align-items: flex-start; margin-bottom: 3rem; position: relative; }
+    .identity-row::before { content: ''; position: absolute; left: 30px; top: 60px; bottom: -40px; width: 2px; background: var(--primary-light); opacity: 0.2; }
+    .identity-row:last-child::before { display: none; }
+    .identity-icon { min-width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: var(--primary); color: white; box-shadow: 0 10px 20px rgba(76, 29, 149, 0.2); z-index: 1; }
+    .identity-content { background: var(--glass); padding: 2rem; border-radius: 25px; border: 1px solid var(--glass-border); flex: 1; box-shadow: var(--shadow-aura); }
+    .values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem; }
+    .value-item { text-align: center; padding: 1.5rem; border-radius: 20px; background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.2); }
+    .value-item i { font-size: 1.5rem; color: var(--accent); margin-bottom: 0.8rem; display: block; }
+
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; width: 100%; }
+    .faq-card { border: 1px solid var(--glass-border); border-radius: 20px; background: var(--glass); overflow: hidden; transition: 0.3s; height: fit-content; }
+    .faq-card:hover { border-color: var(--primary-light); }
+    .faq-question { padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--primary); cursor: pointer; }
+    .faq-answer { max-height: 0; padding: 0 1.5rem; opacity: 0; transition: all 0.4s ease; font-size: 0.9rem; line-height: 1.6; }
+    .faq-card.active .faq-answer { max-height: 300px; padding: 0 1.5rem 1.5rem 1.5rem; opacity: 1; background: rgba(76, 29, 149, 0.02); }
+    .faq-card.active { border-color: var(--primary); box-shadow: var(--shadow-aura); }
+    .faq-card.active i { transform: rotate(180deg); color: var(--accent); }
+
+    .method-nav { display: flex; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 14px; gap: 5px; margin-bottom: 1.5rem; width: fit-content; }
+    .method-btn { border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: 0.3s; background: transparent; color: var(--text-dark); opacity: 0.6; }
+    .method-btn.active { background: var(--primary); color: white; opacity: 1; box-shadow: 0 4px 10px rgba(76, 29, 149, 0.2); }
+    body.dark-mode .method-nav { background: rgba(255,255,255,0.05); }
+
+    .sub-step-box { margin-left: 42px; border-left: 2px solid var(--primary-light); padding: 0.5rem 0 1rem 1.5rem; position: relative; }
+    .sub-step-item { font-size: 0.85rem; margin-bottom: 8px; opacity: 0.8; position: relative; }
+    .sub-step-item::before { content: '•'; position: absolute; left: -1.2rem; color: var(--primary-light); font-weight: bold; }
+
+    /* Org Chart Specific Connectors */
+    .org-connector-v { width: 2px; height: 30px; background: var(--primary-light); margin: 0 auto; opacity: 0.4; }
+    .org-connector-h { width: 80%; height: 2px; background: var(--primary-light); margin: 0 auto; opacity: 0.2; }
+
+    /* Citizen Charter Buttons */
+    .charter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; width: 100%; margin-top: 1rem; }
+    .charter-card { 
+      background: var(--glass); border: 1px solid var(--glass-border); padding: 1.5rem; 
+      border-radius: 20px; cursor: pointer; transition: 0.3s; display: flex; 
+      align-items: center; gap: 1rem; position: relative; overflow: hidden;
+    }
+    .charter-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: var(--shadow-aura); }
+    .charter-card i { font-size: 1.5rem; color: var(--primary-light); }
+    .charter-card h4 { font-size: 1rem; color: var(--text-dark); }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+      display: none; justify-content: center; align-items: center; z-index: 9999;
+      padding: 20px;
+    }
+    .modal-content {
+      background: var(--glass); max-width: 90%; max-height: 90vh; border-radius: 25px;
+      position: relative; overflow: hidden; animation: slideUp 0.4s ease;
+      border: 1px solid var(--glass-border); box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 20px; font-size: 1.5rem;
+      cursor: pointer; color: var(--text-dark); z-index: 10;
+    }
+    .modal-img { 
+      width: 100%; 
+      height: auto; 
+      max-height: 80vh; 
+      display: block; 
+      object-fit: contain; 
+    }
+
+    @media (max-width: 992px) {
+      .menu-toggle { display: block; }
+      .nav-group {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+        background: var(--glass); flex-direction: column;
+        padding: 100px 10% 40px; gap: 15px;
+        transform: translateX(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 3000; overflow-y: auto; display: flex;
+      }
+      .nav-group.active { transform: translateX(0); }
+      .nav-group .btn-outline { width: 100%; padding: 1.2rem; justify-content: flex-start; }
+      .dropdown { width: 100%; }
+      .dropdown-content { position: static; width: 100%; display: none; background: rgba(0,0,0,0.03); border-radius: 12px; }
+      .dropdown.mobile-open .dropdown-content { display: block; }
+      .identity-row::before { display: none; }
+      .identity-row { flex-direction: column; align-items: center; text-align: center; }
+      .values-grid { grid-template-columns: 1fr; }
+      .charter-grid { grid-template-columns: 1fr; }
+    }
+
+    .fixed-footer {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      background: var(--glass); border-top: 1px solid var(--glass-border);
+      padding: 1.2rem; text-align: center; font-size: 0.75rem;
+      font-weight: 700; z-index: 1000; letter-spacing: 1px;
+    }
+
+    .req-box { background: var(--glass); padding: 1.5rem; border-radius: 30px; border-top: 5px solid var(--accent); box-shadow: var(--shadow-aura); }
+    .step-box { background: var(--glass); padding: 2.5rem; border-radius: 30px; border: 1px dashed var(--primary-light); box-shadow: var(--shadow-aura); }
+
+    .page-animate { animation: fadeInPage 0.5s ease forwards; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInPage { from { opacity: 0; } to { opacity: 1; } }
+
+    .hero-container { padding: 1.5rem 5%; }
+    .slideshow { height: 620px; border-radius: 35px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); box-shadow: var(--shadow-aura); }
+    .slide { position: absolute; inset: 0; opacity: 0; transition: 1.5s ease; object-fit: cover; width: 100%; height: 100%; }
+    .slide.active { opacity: 1; }
+    
+    .slide-caption { 
+      position: absolute; bottom: 25px; left: 25px; 
+      background: rgba(0, 0, 0, 0.5); color: white; 
+      padding: 0.6rem 1.2rem; border-radius: 12px; 
+      backdrop-filter: blur(8px); font-weight: 600; 
+      font-size: 0.9rem; z-index: 10;
+    }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; padding: 0 5% 3rem; }
+    .stat-card { background: var(--glass); border-radius: 25px; padding: 1.5rem; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+    .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-aura); }
+    .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .icon-box { width: 55px; height: 55px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+    .manual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; width: 100%; }
+    .list-item { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem; font-weight: 600; }
+    .num-circle { min-width: 32px; height: 32px; background: var(--primary); color: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+
+    .dir-link { text-decoration: none; color: inherit; display: block; transition: 0.2s; }
+    .dir-link:hover { color: var(--primary-light); transform: translateY(-5px); }
+
+    .hidden { display: none !important; }
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { 
+        .stats-grid, .manual-grid, .faq-grid { grid-template-columns: 1fr; } 
+    }
+
+    .search-container { position: relative; width: 100%; max-width: 400px; margin-top: 1rem; }
+    .search-container i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.4; }
+    .directory-search-input {
+      width: 100%; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 15px; 
+      border: 1px solid var(--glass-border); background: var(--glass);
+      color: var(--text-dark); font-weight: 600; outline: none; transition: 0.3s;
+    }
+    .directory-search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(76, 29, 149, 0.1); }
+  </style>
+</head>
+<body>
+
+  <div class="modal-overlay" id="charterModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></span>
+      <img src="" alt="Service Charter" id="modalImg" class="modal-img">
+    </div>
+  </div>
+
+  <header class="header-nav">
+    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer; z-index: 3001;" onclick="showPage('homePage')">
+      <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800;">L</div>
+      <h2 style="font-size: 1.1rem; color: var(--primary);">BPLO Liloan</h2>
+    </div>
+
+    <div class="nav-wrapper">
+      <button class="btn-outline" onclick="toggleDarkMode()"><i class="fas fa-moon" id="themeIcon" style="color: #6366f1;"></i></button>
+      <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars" id="menuIcon"></i></div>
+
+      <nav class="nav-group" id="navGroup">
+        <button class="btn-outline" onclick="showPage('homePage')"><i class="fas fa-home icon-home"></i> Home</button>
+        
+        <div class="dropdown" id="manualsDrop">
+          <button class="btn-outline" onclick="toggleDropdown('manualsDrop')">
+            <i class="fas fa-book-open icon-manuals"></i> Manuals <i class="fas fa-chevron-down" style="margin-left:auto; font-size:0.7rem; opacity:0.5;"></i>
+          </button>
+          <div class="dropdown-content">
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('createAccount')"><i class="fas fa-user-plus" style="color:#6366f1"></i> Create Account</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('newBusiness')"><i class="fas fa-building" style="color:#f59e0b"></i> New Business</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('renewal')"><i class="fas fa-sync-alt" style="color:#10b981"></i> Renewal</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('mtop')"><i class="fas fa-motorcycle" style="color:#ef4444"></i> MTOP</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('certifications')"><i class="fas fa-certificate" style="color:#3b82f6"></i> Certifications</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="loadManual('retirement')"><i class="fas fa-user-slash" style="color:#dc1a1a"></i> Retirement</div>
+          </div>
+        </div>
+
+        <button class="btn-outline" onclick="showPage('dirPage')"><i class="fas fa-address-book icon-dirs"></i> Issuances</button>
+
+        <div class="dropdown" id="moreDrop">
+          <button class="btn-outline" onclick="toggleDropdown('moreDrop')">
+            <i class="fas fa-plus-circle icon-more"></i> More <i class="fas fa-chevron-down" style="margin-left:auto; font-size:0.7rem; opacity:0.5;"></i>
+          </button>
+          <div class="dropdown-content">
+            <div class="btn-outline" style="border:none; width:100%;" onclick="showPage('faqPage')"><i class="fas fa-question-circle" style="color:#10b981"></i> FAQs</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="showPage('charterPage')"><i class="fas fa-scroll" style="color:#f59e0b"></i> Citizen's Charter</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="showPage('orgPage')"><i class="fas fa-sitemap" style="color:#8b5cf6"></i> Organizational Chart</div>
+            <div class="btn-outline" style="border:none; width:100%;" onclick="showPage('missionPage')"><i class="fas fa-eye" style="color:#3b82f6"></i> Mission & Vision</div>
+          </div>
+        </div>
+
+        <button class="btn-outline" onclick="showPage('feedbackPage')">
+          <i class="fas fa-comment-alt icon-feedback"></i> Feedback
+        </button>
+
+        <button class="btn-outline" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white;" onclick="window.open('https://bpbc.ibpls.com/liloansouthernleyte', '_blank')">
+          <i class="fas fa-external-link-alt" style="color: white;"></i> iBPLS Website
+        </button>
+
+        <div class="live-badge" id="liveClock">Loading Date & Time...</div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div id="homePage" class="page-animate">
+      <section class="hero-container">
+        <div class="slideshow">
+          <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200" class="slide active">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200" class="slide">
+          <div class="slide-caption" id="slideNameDisplay">Liloan Modern Office</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+          <div class="stat-card">
+            <div><p style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">ACTIVE PERMITS</p><div class="stat-number" data-val="1146">0</div></div>
+            <div class="icon-box" style="background: rgba(16, 185, 129, 0.1); color: var(--stat-green);"><i class="fas fa-file-circle-check"></i></div>
+          </div>
+          <div class="stat-card">
+            <div><p style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">NEW BUSINESS</p><div class="stat-number" data-val="113">0</div></div>
+            <div class="icon-box" style="background: rgba(245, 158, 11, 0.1); color: var(--stat-orange);"><i class="fas fa-hotel"></i></div>
+          </div>
+          <div class="stat-card">
+            <div><p style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">RENEWALS</p><div class="stat-number" data-val="1033">0</div></div>
+            <div class="icon-box" style="background: rgba(59, 130, 246, 0.1); color: var(--stat-blue);"><i class="fas fa-arrows-rotate"></i></div>
+          </div>
+          <div class="stat-card">
+            <div><p style="opacity: 0.5; font-size: 0.7rem; font-weight: 800;">MOTORIZED TRICYCLE OPERATOR'S PERMIT</p><div class="stat-number" data-val="263">0</div></div>
+            <div class="icon-box" style="background: rgba(236, 72, 153, 0.1); color: var(--stat-pink);"><i class="fas fa-motorcycle"></i></div>
+          </div>
+      </section>
+
+      <section style="padding: 0 5% 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;" class="manual-grid">
+        <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+          <h3 style="color: var(--primary);"><i class="fas fa-location-dot" style="color:#ef4444"></i> Find Us On Map</h3>
+          <div style="width: 100%; height: 350px; border-radius: 20px; overflow: hidden; border: 1px solid #eee;">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15715.111956502213!2d125.1189417554199!3d10.15003340000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3306fe6704043b35%3A0x6d9004d9c49735d4!2sLiloan%20Municipal%20Hall!5e0!3m2!1sen!2sph!4v1709600000000!5m2!1sen!2sph" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="stat-card" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+          <h3 style="color: var(--primary);"><i class="fas fa-camera-retro" style="color:#3b82f6"></i> Office Facade</h3>
+          <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800" style="width:100%; height:350px; object-fit:cover; border-radius: 20px;">
+        </div>
+      </section>
+    </div>
+
+    <div id="orgPage" class="hidden" style="padding: 4rem 5%;">
+      <div class="page-animate" style="max-width: 1100px; margin: 0 auto; text-align: center;">
+        <h1 style="color: var(--primary); margin-bottom: 3rem;"><i class="fas fa-sitemap"></i> Organizational Structure</h1>
+
+        <div style="margin-bottom: 2rem;">
+          <div class="stat-card" style="display: inline-flex; flex-direction: column; width: 280px; padding: 2rem; border: 2px solid var(--primary);">
+            <img src="https://via.placeholder.com/150" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; border: 4px solid var(--primary-light);">
+            <h3 style="color: var(--primary);">HON. MAYOR NAME</h3>
+            <p style="font-weight: 800; font-size: 0.8rem; opacity: 0.6; text-transform: uppercase;">Municipal Mayor</p>
+          </div>
+          <div class="org-connector-v"></div>
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <div class="stat-card" style="display: inline-flex; flex-direction: column; width: 260px; padding: 1.5rem; border: 1px solid var(--stat-blue);">
+            <img src="https://via.placeholder.com/150" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem;">
+            <h3>TREASURER NAME</h3>
+            <p style="font-weight: 800; font-size: 0.75rem; color: var(--stat-blue); text-transform: uppercase;">Municipal Treasurer</p>
+          </div>
+          <div class="org-connector-v"></div>
+          <div class="org-connector-h"></div>
+        </div>
+
+        <div class="manual-grid" style="grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+          <div class="stat-card" style="flex-direction: column; padding: 1.5rem;">
+            <img src="https://via.placeholder.com/150" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.9rem;">STAFF NAME</h4>
+            <p style="font-size: 0.7rem; opacity: 0.6;">Designation 1</p>
+          </div>
+          <div class="stat-card" style="flex-direction: column; padding: 1.5rem;">
+            <img src="https://via.placeholder.com/150" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.9rem;">STAFF NAME</h4>
+            <p style="font-size: 0.7rem; opacity: 0.6;">Designation 2</p>
+          </div>
+          <div class="stat-card" style="flex-direction: column; padding: 1.5rem;">
+            <img src="https://via.placeholder.com/150" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.9rem;">STAFF NAME</h4>
+            <p style="font-size: 0.7rem; opacity: 0.6;">Designation 3</p>
+          </div>
+          <div class="stat-card" style="flex-direction: column; padding: 1.5rem;">
+            <img src="https://via.placeholder.com/150" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 1rem;">
+            <h4 style="font-size: 0.9rem;">STAFF NAME</h4>
+            <p style="font-size: 0.7rem; opacity: 0.6;">Designation 4</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="missionPage" class="hidden" style="padding: 4rem 5%;">
+      <div class="identity-section page-animate" style="max-width: 900px; margin: 0 auto;">
+        
+        <div class="identity-row">
+          <div class="identity-icon" style="background: var(--stat-blue);"><i class="fas fa-mountain-sun"></i></div>
+          <div class="identity-content">
+            <h3>Vision</h3>
+            <p>"A comptetitive growth center in Southern Leyte with a clean, safe, and resilient community of empowered Liloans, governed by principled leaders."</p>
+          </div>
+        </div>
+
+        <div class="identity-row">
+          <div class="identity-icon" style="background: var(--primary);"><i class="fas fa-rocket"></i></div>
+          <div class="identity-content">
+            <h3>Mission</h3>
+            <p>The Municiaplity of Liloan shall:</p>
+            <ul style="margin-top: 1rem; margin-left: 1.2rem; line-height: 1.8;">
+                <li>Establish an investment friendly culture through an improved facilities and infrastructure;</li>
+                <li>Provision of quality and sustainable basic services to the constituents;</li>
+                <li>Provision of modern and application technology on Fisheries and Agriculture;</li>
+                <li>Sustain peace and order and public safety of the municipality of Liloan</li>
+                <li>Provide realistic measures to increase awareness on disaster risk reduction;</li>
+                <li>Enact and implement local laws and policies/ordinances beneficial for the general welfare of the people;</li>
+                <li>Provide responsive health and emergency services and public assistance;</li>
+                <li>Install or rehabilitate climate change and disaster-resilient structures and facilities along strategic areas;</li>
+                <li>Provide demand-driven livelihood skills and capability building programs to capacitate and rebuild normal living condition to disaster affected communities;</li>
+                <li>It shall also ensure a functional Local Special Bodies and other mandatory councils and committees guided by consultative, participative local funtionaries, officials and other stakeholders;</li>
+                <li>Enhancing and promoting better quality of life, wholesome and sustainable benefiting competent, cooperative and participative local constituents.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="identity-row">
+          <div class="identity-icon" style="background: var(--accent);"><i class="fas fa-heart"></i></div>
+          <div class="identity-content">
+            <h3>Core Values</h3>
+            <div class="values-grid">
+              <div class="value-item">
+                <i class="fas fa-shield-halved"></i>
+                <strong>Integrity</strong>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Honesty in every transaction.</p>
+              </div>
+              <div class="value-item">
+                <i class="fas fa-lightbulb"></i>
+                <strong>Innovation</strong>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Embracing digital change.</p>
+              </div>
+              <div class="value-item">
+                <i class="fas fa-handshake-angle"></i>
+                <strong>Service</strong>
+                <p style="font-size: 0.8rem; opacity: 0.7;">Proactive public assistance.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="faqPage" class="hidden" style="padding: 2rem 5%;">
+      <div class="page-animate" style="max-width: 1000px; margin: 0 auto;">
+        <h1 style="color: var(--primary); margin-bottom: 2rem; text-align: center;"><i class="fas fa-question-circle" style="color:#10b981"></i> Frequently Asked Questions</h1>
+        
+        <div class="faq-grid">
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">What are your operating hours? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">We are open from Monday to Friday, 8:00 AM to 5:00 PM. We do not close during noon break to ensure continuous public service.</div>
+            </div>
+
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">How long is the processing time? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Processing times are typically 1 to 3 working days for both renewals and new business permits, provided all requirements and inspections are cleared for new applications.</div>
+            </div>
+            
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">What is Capital Investment? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Capital Investment is the capital which a person employs in any undertaking or which he contributes to the capital of a partnership, corporation, or any other juridical entity or association in a particular taxing jurisdiction.</div>
+            </div>
+
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">What does Gross Sales/Receipts mean? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Gross sales or receipt include the total amount of money or its equivalent representing the contract price, compensation or service fee, including the amount charged or materials supplied with the services and deposits or advance payments actually or constructively received during the taxable quarter for the services performed for another excluding discounts if determined at the time of sales, sales of return, exercise tax and value-added tax (VAT).</div>
+            </div>
+
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">Can I apply for a permit online? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Yes, visit the iBPLS Website for registrations. Simply create an account and follow the online wizard to submit your application digitally.</div>
+            </div>
+            
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">Can you pay all the tax, fees and charges online? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Yes! You can pay online using your LBP ATM account, Gcash & etc. via LandBank Linkbiz Portal.</div>
+            </div>
+            
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">What are the Modes of Payment? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">For New Business, the applicant can only choose the Annual mode of payment, for Renewal of Business, the applicant can choose either Annual or Quarterly mode of payment</div>
+            </div>
+
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">Validity of Permit <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">The Mayor's Permit shall be granted for a period of not more than one (1) year and shall expire on the thirty-first (31st) of December following the date of issuance unless revoked or surrendered earlier.  Every permit shall cease to be in force upon revocation or surrender thereof.</div>
+            </div>
+ 
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">When is the renewal of permits? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">The permit issued shall be renewed within the first twenty (20) days of January. It shall have a continuing validity only upon renewal thereof and payment of the corresponding fee. The Sanggunian may, for a justifiable reason or cause, extend the time for payment of such taxes without surcharges or penalties, but only for a period not exceeding six (6) months</div>
+            </div>
+            
+            <div class="faq-card" onclick="toggleFaq(this)">
+                <div class="faq-question">What happens if I miss the renewal? <i class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer">Late renewals are subject to a 25% surcharge and 2% monthly interest. Please ensure renewal by January 20th each year to avoid penalties.</div>
+            </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="charterPage" class="hidden" style="padding: 2rem 5%;">
+      <div class="stat-card page-animate" style="flex-direction: column; align-items: flex-start; padding: 3rem;">
+        <h1 style="color: var(--primary); margin-bottom: 2rem;"><i class="fas fa-scroll" style="color:#f59e0b"></i> Citizen's Charter</h1>
+        <p style="margin-bottom: 2rem; opacity: 0.8;">Click on a service below to view the detailed citizen's charter requirements and processing workflow.</p>
+        
+        <div class="charter-grid">
+          <div class="charter-card" onclick="openModal('https://ichef.bbci.co.uk/news/2048/cpsprodpb/D059/production/_127273335_comedy9.jpg')">
+            <i class="fas fa-sync-alt"></i>
+            <div>
+              <h4>Business Renewal</h4>
+              <p style="font-size: 0.75rem; opacity: 0.6;">1 Working Day • BPLO Assessment</p>
+            </div>
+          </div>
+
+          <div class="charter-card" onclick="openModal('NEW_BUSINESS_IMAGE_URL')">
+            <i class="fas fa-building"></i>
+            <div>
+              <h4>New Business Permit</h4>
+              <p style="font-size: 0.75rem; opacity: 0.6;">3 Working Days • Licensing Section</p>
+            </div>
+          </div>
+
+          <div class="charter-card" onclick="openModal('CERTIFICATION_IMAGE_URL')">
+            <i class="fas fa-certificate"></i>
+            <div>
+              <h4>Certification of Business</h4>
+              <p style="font-size: 0.75rem; opacity: 0.6;">1 Hour • Records Management</p>
+            </div>
+          </div>
+
+          <div class="charter-card" onclick="openModal('RETIREMENT_IMAGE_URL')">
+            <i class="fas fa-user-slash"></i>
+            <div>
+              <h4>Retirement of Business</h4>
+              <p style="font-size: 0.75rem; opacity: 0.6;">5 Working Days • Audit & Treasury</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dirPage" class="hidden" style="padding: 2rem 5%;">
+      <div class="stat-card page-animate" style="flex-direction: column; align-items: flex-start; padding: 3rem;">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <h1>Issuances</h1>
+          <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="directorySearchInput" class="directory-search-input" placeholder="Search contacts and hotlines..." onkeyup="filterDirectories()">
+          </div>
+        </div>
+
+        <div class="manual-grid" id="directoryGrid">
+          <a href="https://drive.google.com/file/d/1o_MgjAe71UNPBcaIisYWWimSZYnXfejM/view?usp=sharing" target="_blank" class="dir-link" style="width: 100%;">
+            <div class="req-box" style="border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
+              <div><h4>Executive Order No. 01 Series of 2025</h4><p>An Order Setting-up the Business One-Stop-Shop (BOSS) Facility</p></div>
+              <i class="fas fa-external-link-alt" style="opacity: 0.3;"></i>
+            </div>
+          </a>
+          <a href="https://sites.google.com/view/bossliloansl/directories" target="_blank" class="dir-link" style="width: 100%;">
+            <div class="req-box" style="border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
+              <div><h4>BPLO Contacts</h4><p>An Order Setting-up the Business One-Stop-Shop (BOSS) Facility</p></div>
+              <i class="fas fa-external-link-alt" style="opacity: 0.3;"></i>
+            </div>
+          </a>
+          <a href="https://sites.google.com/view/bossliloansl/directories" target="_blank" class="dir-link" style="width: 100%;">
+            <div class="req-box" style="border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
+              <div><h4>BPLO Contacts</h4><p>Click to view full directory</p></div>
+              <i class="fas fa-external-link-alt" style="opacity: 0.3;"></i>
+            </div>
+          </a>
+          <a href="https://sites.google.com/view/bossliloansl/directories" target="_blank" class="dir-link" style="width: 100%;">
+            <div class="req-box" style="border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center;">
+              <div><h4>BPLO Contacts</h4><p>Click to view full directory</p></div>
+              <i class="fas fa-external-link-alt" style="opacity: 0.3;"></i>
+            </div>
+          </a>
+          <a href="https://sites.google.com/view/bossliloansl/directories" target="_blank" class="dir-link" style="width: 100%;">
+            <div class="req-box" style="border-left: 5px solid #ec4899; display: flex; justify-content: space-between; align-items: center;">
+              <div><h4>Emergency Hotline</h4><p>Click to view full directory</p></div>
+              <i class="fas fa-external-link-alt" style="opacity: 0.3;"></i>
+            </div>
+          </a>
+          </div>
+      </div>
+    </div>
+
+    <div id="feedbackPage" class="hidden" style="padding: 2rem 5%;">
+      <div class="req-box" style="height: 700px; padding: 10px; overflow: hidden;">
+        <iframe src="https://form.jotform.com/240957550026052" style="width:100%; height:100%; border:none; border-radius:20px;"></iframe>
+      </div>
+    </div>
+
+    <div id="manualDetailPage" class="hidden" style="padding: 2rem 5%;">
+      <div class="stat-card page-animate" style="flex-direction: column; align-items: flex-start; padding: 3rem;">
+        <button class="btn-outline" onclick="showPage('homePage')"><i class="fas fa-arrow-left"></i> Back</button>
+        <h1 id="manualTitle" style="font-size: 2.2rem; color: var(--primary); margin-top: 2rem;"></h1>
+        <div class="manual-grid">
+          <div class="req-box">
+            <h3>Requirements</h3>
+            <div id="reqList" style="margin-top:1.5rem"></div>
+          </div>
+          <div class="step-box">
+            <div class="method-nav">
+               <button class="method-btn active" id="btnWalkIn" onclick="toggleMethod('walkIn')">Walk-in Application</button>
+               <button class="method-btn" id="btnOnline" onclick="toggleMethod('online')">Online Application</button>
+            </div>
+            <div id="stepList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="fixed-footer">
+    © 2026 MUNICIPALITY OF LILOAN · BUSINESS PERMIT & LICENSING OFFICE
+  </footer>
+
+  <script>
+    const manualData = {
+      createAccount: { title: "Create Account", icon: "fas fa-user-plus", iconCol: "#6366f1", requirements: ["Active Email Address", "Mobile Number", "Valid Government ID"], walkIn: ["Visit the BPLO Computer Kiosk.", "Approach the help desk for guided registration.", "Submit ID for verification.", "Receive temporary login credentials."], online: [{ step: "Portal Access", substeps: ["Go to iBPLS Website", "Click 'Register New Account'"] }, { step: "Verification", substeps: ["Enter valid email address", "Click verification link sent to your inbox"] }, { step: "Profile Completion", substeps: ["Upload photo of Valid ID", "Fill out personal/owner details"] }] },
+      newBusiness: { title: "New Business", icon: "fas fa-building", iconCol: "#f59e0b", requirements: ["Sworn Statement of Capitalization", "Photocopy of Community Tax Certificate (Cedula)", "Photocopy of DTI/SEC/CDA Registration", "Photocopy of Contract of Lease, if leasing", "Photocopy of Zoning Certificate", "Photocopy of Building Permit", "Photocopy of Sanitary Permit", "Photocopy of Food Handler's Certificate", "Photocopy of Fire Safety Inspection Certificate"], walkIn: [{ step: "Submit complete requirements.", substeps: ["Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }], online: [{ step: "Login Account and Create Application", substeps: ["Visit iBPLS Website and Login to your account", "Click New Application", "Select New for the Type of Application", "Choose Annually for Mode of Payment", "Set Current Year for Tax Year", "Click the Tick Box General Barangay Clearance"] }, { step: "Business Information and Registration", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Operation", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Activity / Requirements", substeps: ["For business code, refer to the PSIC Code 2019, or you may search through the search box", "Click Add Line of Business, search and select business line/s, then click + icon", "Input your capitalization by clicking 0.00 under Capital Investments of every business line, then click save", "Upload Requirements, click Requirement Name dropdown button and select requirement then Choose File, and then click Upload.", "Once all information is complete, click NEXT."] }, { step: "Summary", substeps: ["Review all information and click SUBMIT on the lower part, a pop-up box will appear and tick the checkbox, then click SUBMIT", "Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }] },
+      renewal: { title: "Renewal", icon: "fas fa-sync-alt", iconCol: "#10b981", requirements: ["Sworn Statement of Previous Year's Gross Sales/Receipt", "Photocopy of Community Tax Certificate (Cedula)", "Photocopy of DTI/SEC/CDA Registration", "Photocopy of Contract of Lease, if leasing", "Photocopy of Sanitary Permit", "Photocopy of Food Handler's Certificate", "Photocopy of Fire Safety Inspection Certificate"], walkIn: [{ step: "Submit complete requirements.", substeps: ["Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }], online: [{ step: "Login Account and Create Application", substeps: ["Visit iBPLS Website and Login to your account", "Click New Application", "Select Renew for the Type of Application", "Click Search Existing Business", "A pop-up box will appear, choose your Business to renew and click the check icon on the right side, then click Yes to load your data", "If business is still not added to your account, click Link Business, a pop-up box will appear, enter the Business Identification Number (BIN) and Business Permit No. which can be seen from your Business Permit, then click Search to load your data", "Choose Annually or Quarterly for Mode of Payment", "Set Current Year for Tax Year", "Click the Tick Box General Barangay Clearance"] }, { step: "Business Information and Registration", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Operation", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Activity / Requirements", substeps: ["In the Line of Business, input your Gross Sales/Receipt by clicking 0.00 under Gross Sales/Receipt of every business line, then click save", "Upload Requirements, click Requirement Name dropdown button and select requirement then Choose File, and then click Upload.", "Once all information is complete, click NEXT."] }, { step: "Summary", substeps: ["Review all information and click SUBMIT on the lower part, a pop-up box will appear and tick the checkbox, then click SUBMIT", "Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }] },
+      mtop: { title: "Motorized Tricycle Operator's Permit", icon: "fas fa-motorcycle", iconCol: "#ef4444", requirements: ["Photocopy of Community Tax Certificate", "Latest LTO OR/CR (for-hire)", "Drivers License (Professional)", "Approved SB Resolution Granting Franchise to operate Motorized Tricycle (1 week processing - every Monday","Vehicle Inspection Certificate", "Picture of Unit (front, back and side-to-side)", "Photocopy of Sanitary Permit"], walkIn: [{ step: "Submit complete requirements.", substeps: ["Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }], online: [{ step: "Login Account and Create Application", substeps: ["Visit iBPLS Website and Login to your account", "Click New Application", "Select Renew for the Type of Application", "Click Search Existing Business", "A pop-up box will appear, choose your Business to renew and click the check icon on the right side, then click Yes to load your data", "If business is still not added to your account, click Link Business, a pop-up box will appear, enter the Business Identification Number (BIN) and Business Permit No. which can be seen from your Business Permit, then click Search to load your data", "Choose Annually or Quarterly for Mode of Payment", "Set Current Year for Tax Year", "Click the Tick Box General Barangay Clearance"] }, { step: "Business Information and Registration", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Operation", substeps: ["Fill in all required information", "Once all information is complete, click NEXT"] }, { step: "Business Activity / Requirements", substeps: ["In the Line of Business, input your Gross Sales/Receipt by clicking 0.00 under Gross Sales/Receipt of every business line, then click save", "Upload Requirements, click Requirement Name dropdown button and select requirement then Choose File, and then click Upload.", "Once all information is complete, click NEXT."] }, { step: "Summary", substeps: ["Review all information and click SUBMIT on the lower part, a pop-up box will appear and tick the checkbox, then click SUBMIT", "Your application will be reviewed by the BPLO and indorsed to the indorsing offices for approval", "Onced approved, the Municipal Treasurer will assess all the Tax dues, fees and charges and will be available for payment"] }, { step: "Pay Tax due and fees", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim Permit and other certificates at the Releasing Counter", substeps: ["The BPLO staff will print the permit and certificates and record on the logbook", "Once you have signed on the logbook, the BPLO staff will release your copy of the Permit and certificates"] }] },
+      certifications: { title: "Certifications", icon: "fas fa-certificate", iconCol: "#3b82f6", requirements: ["Request Form", "Certification Issued by respective Barangay"], walkIn: [{ step: "Submit complete requirements.", substeps: ["The BPLO will review and validate the documents submitted"] }, { step: "Pay Certification fee", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim certificate at the Releasing Counter", substeps: ["The BPLO staff will print the certificate and release your copy of the certificate applied"] }], online: [{ step: "Not yet available", substeps: ["Visit us at Business Permit Licensing Office"] },] },
+      retirement: { title: "Retirement", icon: "fas fa-user-slash", iconCol: "#dc1a1a", requirements: ["Affidavit of Closure", "Original Permit", "Current Year's Gross Sales from January up to date of Closure", "Certificate of Closure from Barangay"], walkIn: [{ step: "Submit complete requirements.", substeps: ["The BPLO will review and validate the documents submitted"] }, { step: "Pay Certification fee", substeps: ["The treasury staff will issue the Official Receipt for your payment"] }, { step: "Claim certificate at the Releasing Counter", substeps: ["The BPLO staff will print the certificate and release your copy of the certificate of retirement"] }], online: [{ step: "Not yet available", substeps: ["Visit us at Business Permit Licensing Office"] },] }
+    };
+
+    let activeManual = null;
+
+    function toggleMenu() {
+      const nav = document.getElementById('navGroup');
+      const icon = document.getElementById('menuIcon');
+      nav.classList.toggle('active');
+      icon.className = nav.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+    }
+
+    function toggleDropdown(id) {
+      if (window.innerWidth <= 992) document.getElementById(id).classList.toggle('mobile-open');
+    }
+
+    function showPage(id) {
+      document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById('navGroup').classList.remove('active');
+      document.getElementById('menuIcon').className = 'fas fa-bars';
+      window.scrollTo(0,0);
+    }
+
+    function loadManual(key) {
+      activeManual = manualData[key];
+      document.getElementById('manualTitle').innerHTML = `<i class="${activeManual.icon}" style="color:${activeManual.iconCol}"></i> ${activeManual.title}`;
+      document.getElementById('reqList').innerHTML = activeManual.requirements.map(req => `<div class="list-item"><i class="fas fa-check-circle" style="color:var(--stat-green)"></i> ${req}</div>`).join('');
+      toggleMethod('walkIn'); 
+      showPage('manualDetailPage');
+    }
+
+    function toggleMethod(method) {
+      const walkBtn = document.getElementById('btnWalkIn');
+      const onlineBtn = document.getElementById('btnOnline');
+      const listContainer = document.getElementById('stepList');
+      walkBtn.classList.toggle('active', method === 'walkIn');
+      onlineBtn.classList.toggle('active', method === 'online');
+      let html = '';
+      const data = activeManual[method];
+      data.forEach((item, index) => {
+        if (typeof item === 'string') {
+          html += `<div class="list-item"><div class="num-circle">${index + 1}</div> ${item}</div>`;
+        } else {
+          html += `<div style="margin-bottom: 1.2rem;"><div class="list-item" style="margin-bottom: 0.5rem;"><div class="num-circle">${index + 1}</div> <strong>${item.step}</strong></div><div class="sub-step-box">${item.substeps.map(sub => `<div class="sub-step-item">${sub}</div>`).join('')}</div></div>`;
+        }
+      });
+      listContainer.innerHTML = html;
+    }
+
+    function toggleFaq(card) {
+        const isActive = card.classList.contains('active');
+        document.querySelectorAll('.faq-card').forEach(item => item.classList.remove('active'));
+        if (!isActive) card.classList.add('active');
+    }
+
+    function openModal(imgSrc) {
+      const modal = document.getElementById('charterModal');
+      const img = document.getElementById('modalImg');
+      img.src = imgSrc;
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('charterModal').style.display = 'none';
+    }
+
+    function filterDirectories() {
+      const input = document.getElementById('directorySearchInput').value.toLowerCase();
+      const grid = document.getElementById('directoryGrid');
+      const links = grid.getElementsByClassName('dir-link');
+
+      for (let i = 0; i < links.length; i++) {
+        const title = links[i].querySelector('h4').innerText.toLowerCase();
+        const desc = links[i].querySelector('p').innerText.toLowerCase();
+        
+        if (title.includes(input) || desc.includes(input)) {
+          links[i].style.display = ""; 
+        } else {
+          links[i].style.display = "none"; 
+        }
+      }
+    }
+
+    setInterval(() => { 
+      const now = new Date();
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const dateStr = now.toLocaleDateString(undefined, options);
+      const timeStr = now.toLocaleTimeString();
+      document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`; 
+    }, 1000);
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const icon = document.getElementById('themeIcon');
+      icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+
+    if(localStorage.getItem('theme') === 'dark') toggleDarkMode();
+
+    let sIdx = 0;
+    const slideLabels = ["Liloan Modern Office", "Digital Business District"];
+    setInterval(() => {
+      const slides = document.querySelectorAll('.slide');
+      const labelElement = document.getElementById('slideNameDisplay');
+      if(slides.length) {
+        slides[sIdx].classList.remove('active');
+        sIdx = (sIdx + 1) % slides.length;
+        slides[sIdx].classList.add('active');
+        if(labelElement) labelElement.innerText = slideLabels[sIdx];
+      }
+    }, 4000);
+
+    document.querySelectorAll('.stat-number').forEach(n => {
+      const target = +n.dataset.val;
+      let curr = 0;
+      const t = setInterval(() => {
+        curr += Math.ceil(target/40);
+        if(curr >= target) { n.innerText = target.toLocaleString(); clearInterval(t); }
+        else n.innerText = curr.toLocaleString();
+      }, 30);
+    });
+  </script>
+</body>
+</html>
